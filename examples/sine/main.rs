@@ -14,7 +14,7 @@ fn main() {
             0.0 <= yf && yf < height as f64,
             "{yf} is not in [0; {height})"
         );
-        let y = yf as usize;
+        let y = yf as isize;
         pict.plot(x, y, 0xFFFF00);
     }
 

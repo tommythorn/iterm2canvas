@@ -9,37 +9,39 @@ use base64::prelude::*;
 
 /// `Pict` is a simple rectangular canvas of 32-bit RGB pixel values
 pub struct Pict {
-    width: usize,
-    height: usize,
+    width: isize,
+    height: isize,
     pixel: Vec<u32>,
 }
 
 impl Pict {
     /// Constructs a new canvas of `width` x `height` black (0)
     /// pixels.
-    pub fn new(width: usize, height: usize) -> Self {
+    pub fn new(width: isize, height: isize) -> Self {
+        assert!(0 <= width);
+        assert!(0 <= height);
         Self {
             width,
             height,
-            pixel: vec![0; width * height],
+            pixel: vec![0; (width * height) as usize],
         }
     }
 
-    pub fn width(&self) -> usize {
+    pub fn width(&self) -> isize {
         self.width
     }
 
-    pub fn height(&self) -> usize {
+    pub fn height(&self) -> isize {
         self.height
     }
 
     /// Plots a pixel of color `c` at location (`x`, `y`).
     /// # Panics
     /// Will panic if x or y is outsides the width/height bounds.
-    pub fn plot(&mut self, x: usize, y: usize, c: u32) {
-        assert!(x < self.width);
-        assert!(y < self.height);
-        self.pixel[y * self.width + x] = c;
+    pub fn plot(&mut self, x: isize, y: isize, c: u32) {
+        if 0 <= x && x < self.width && 0 <= y && y < self.height {
+            self.pixel[(y * self.width + x) as usize] = c;
+        }
     }
 
     /// Display the canvas directly inline in the iTerm2 terminal,
@@ -66,4 +68,68 @@ impl Pict {
             7 as char
         );
     }
+
+    pub fn draw_line(&mut self, x0: isize, y0: isize, x1: isize, y1: isize, c: u32) {
+        let xd = x1 - x0;
+        let xs = xd.signum();
+        let xd = xd.abs();
+        let yd = y1 - y0;
+        let ys = yd.signum();
+        let yd = yd.abs();
+
+        if yd < xd {
+            // Slope is yd/xd so whenever x * yd/xd crosses integer
+            // boundy we should advance y
+
+            let mut err = yd / 2;
+            let (mut x, mut y) = (x0, y0);
+
+            for _ in 0..xd {
+                self.plot(x, y, c);
+                x += xs;
+                err += yd;
+                if xd < err {
+                    y += ys;
+                    err -= xd;
+                }
+            }
+        } else {
+            // Slope is xd/yd so whenever y * xd/yd crosses integer
+            // boundx we should advance x
+
+            let mut err = xd / 2;
+            let (mut x, mut y) = (x0, y0);
+
+            for _ in 0..yd {
+                self.plot(x, y, c);
+                y += ys;
+                err += xd;
+                if yd < err {
+                    x += xs;
+                    err -= yd;
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn test() {
+    use Pict;
+
+    let mut pict = Pict::new(100, 100);
+    for x in 0..100 {
+        for y in 0..100 {
+            pict.plot(x, y, 0xFFFF00);
+        }
+    }
+
+    for x in 0..10 {
+        pict.draw_line(x * 10, 0, 0, 100, 0);
+        pict.draw_line(0, x * 10, 100, 0, 0);
+        pict.draw_line(x * 10, 0, 100, 100, 0);
+        pict.draw_line(0, x * 10, 0, 0, 0);
+    }
+    pict.dump_iterm2_image(Some(25));
+    //panic!("This is what it should look like");
 }
