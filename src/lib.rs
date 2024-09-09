@@ -84,7 +84,7 @@ impl Pict {
             let mut err = yd / 2;
             let (mut x, mut y) = (p0.0, p0.1);
 
-            for _ in 0..xd {
+            for _ in 0..=xd {
                 self.plot((x, y), c);
                 x += xs;
                 err += yd;
@@ -100,7 +100,7 @@ impl Pict {
             let mut err = xd / 2;
             let (mut x, mut y) = (p0.0, p0.1);
 
-            for _ in 0..yd {
+            for _ in 0..=yd {
                 self.plot((x, y), c);
                 y += ys;
                 err += xd;
