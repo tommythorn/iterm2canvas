@@ -69,11 +69,11 @@ impl Pict {
         );
     }
 
-    pub fn draw_line(&mut self, x0: isize, y0: isize, x1: isize, y1: isize, c: u32) {
-        let xd = x1 - x0;
+    pub fn draw_line(&mut self, p0: (isize, isize), p1: (isize, isize), c: u32) {
+        let xd = p1.0 - p0.0;
         let xs = xd.signum();
         let xd = xd.abs();
-        let yd = y1 - y0;
+        let yd = p1.1 - p0.1;
         let ys = yd.signum();
         let yd = yd.abs();
 
@@ -82,7 +82,7 @@ impl Pict {
             // boundy we should advance y
 
             let mut err = yd / 2;
-            let (mut x, mut y) = (x0, y0);
+            let (mut x, mut y) = (p0.0, p0.1);
 
             for _ in 0..xd {
                 self.plot(x, y, c);
@@ -98,7 +98,7 @@ impl Pict {
             // boundx we should advance x
 
             let mut err = xd / 2;
-            let (mut x, mut y) = (x0, y0);
+            let (mut x, mut y) = (p0.0, p0.1);
 
             for _ in 0..yd {
                 self.plot(x, y, c);
@@ -125,10 +125,10 @@ fn test() {
     }
 
     for x in 0..10 {
-        pict.draw_line(x * 10, 0, 0, 100, 0);
-        pict.draw_line(0, x * 10, 100, 0, 0);
-        pict.draw_line(x * 10, 0, 100, 100, 0);
-        pict.draw_line(0, x * 10, 0, 0, 0);
+        pict.draw_line((x * 10, 0), (0, 100), 0);
+        pict.draw_line((0, x * 10), (100, 0), 0);
+        pict.draw_line((x * 10, 0), (100, 100), 0);
+        pict.draw_line((0, x * 10), (0, 0), 0);
     }
     pict.dump_iterm2_image(Some(25));
     //panic!("This is what it should look like");
