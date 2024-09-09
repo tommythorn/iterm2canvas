@@ -15,7 +15,7 @@ fn main() {
             "{yf} is not in [0; {height})"
         );
         let y = yf as isize;
-        pict.plot(x, y, 0xFFFF00);
+        pict.plot((x, y), 0xFFFF00);
     }
 
     pict.dump_iterm2_image(None);

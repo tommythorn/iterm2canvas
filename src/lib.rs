@@ -38,9 +38,9 @@ impl Pict {
     /// Plots a pixel of color `c` at location (`x`, `y`).
     /// # Panics
     /// Will panic if x or y is outsides the width/height bounds.
-    pub fn plot(&mut self, x: isize, y: isize, c: u32) {
-        if 0 <= x && x < self.width && 0 <= y && y < self.height {
-            self.pixel[(y * self.width + x) as usize] = c;
+    pub fn plot(&mut self, p: (isize, isize), c: u32) {
+        if 0 <= p.0 && p.0 < self.width && 0 <= p.1 && p.1 < self.height {
+            self.pixel[(p.1 * self.width + p.0) as usize] = c;
         }
     }
 
@@ -85,7 +85,7 @@ impl Pict {
             let (mut x, mut y) = (p0.0, p0.1);
 
             for _ in 0..xd {
-                self.plot(x, y, c);
+                self.plot((x, y), c);
                 x += xs;
                 err += yd;
                 if xd < err {
@@ -101,7 +101,7 @@ impl Pict {
             let (mut x, mut y) = (p0.0, p0.1);
 
             for _ in 0..yd {
-                self.plot(x, y, c);
+                self.plot((x, y), c);
                 y += ys;
                 err += xd;
                 if yd < err {
@@ -120,7 +120,7 @@ fn test() {
     let mut pict = Pict::new(100, 100);
     for x in 0..100 {
         for y in 0..100 {
-            pict.plot(x, y, 0xFFFF00);
+            pict.plot((x, y), 0xFFFF00);
         }
     }
 
